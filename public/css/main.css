@@ -210,8 +210,22 @@ body {
 #donutChart {
     margin-top: 30px;  /* 3 kez aşağıya kaydırıyoruz */
     margin-bottom: 40px; /* Altında boşluk bırakıyoruz */
-    height: 500px !important; /* Yüksekliği uygun hale getiriyoruz */
+    height: 200px ; /* Yüksekliği uygun hale getiriyoruz */
     display: block;
     box-sizing: border-box;
 }
+.chart-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
 
+.chart-item {
+    width: 48%;  /* Her bir grafik için genişlik */
+    height: 500px;  /* Yükseklik */
+}
+
+.chart-item:last-child {
+    width: 55%; /* Line chart'ın daha geniş olmasını sağlamak için */
+    margin-right: 50px; /* Sağdaki boşluğu azaltıyoruz */
+}

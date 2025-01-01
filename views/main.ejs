@@ -71,23 +71,40 @@
             </div>
         </div>
 
-        <!-- İzlenen Dizi Türleri Başlığı -->
-        <h4 style="text-align: left; margin-top: 30px; margin-left: 25px;">İzlenen Dizi Türleri</h4>
+        <h4 style="text-align: left; margin-top: 30px; margin-left: 25px;">Orjinal Dizi İçeriğimizin Tür ve Dizi Başına İzlenme Durumları</h4>
 
-        <!-- Donut Chart Konumu ve Boyutu -->
-        <div style="margin-top: 40px; margin-bottom: 40px;">
-            <canvas id="donutChart"></canvas> <!-- Inline style kaldırıldı -->
+        <!-- Grafiklerin yerleşimi (yan yana) -->
+        <div class="chart-container">
+            <!-- Donut Chart -->
+            <div class="chart-item">
+                <canvas id="donutChart"></canvas>
+            </div>
+
+            <!-- Line Chart -->
+            <div class="chart-item">
+                <!-- Dropdown Menü -->
+                <div style="margin-top: 10px;">
+                    <select id="chartDropdown" style="padding: 5px; font-size: 14px;">
+                        <option value="10">1-10</option>
+                        <option value="20">10-20</option>
+                        <option value="30">20-30</option>
+                        <option value="40">30-40</option>
+                        <option value="50">40-50</option>
+                    </select>
+                </div>
+                <canvas id="lineChart"></canvas>
+            </div>
         </div>
 
         <script>
             // genreData'yı doğrudan JavaScript dizisi olarak alıyoruz
             var genreData = <%- JSON.stringify(genreData) %>;  // Veriyi doğrudan güvenli şekilde alıyoruz
-        
+
             console.log(genreData);  // Veriyi kontrol et
-        
+
             var labels = genreData.map(item => item.ad);
             var data = genreData.map(item => item.adet);
-        
+
             var ctx = document.getElementById('donutChart').getContext('2d');
             var donutChart = new Chart(ctx, {
                 type: 'doughnut',
@@ -115,6 +132,60 @@
                         }
                     }
                 }
+            });
+
+            function updateLineChart(lineChartData) {
+    var lineLabels = lineChartData.map(item => item.dizi_adi);
+    var lineData = lineChartData.map(item => item.izlenme_adet);
+
+    var ctx = document.getElementById('lineChart').getContext('2d');
+
+    // Eğer önceki bir grafik varsa, onu temizle
+    if (window.lineChart instanceof Chart) {
+        window.lineChart.destroy();  // Geçerli bir grafik nesnesi varsa yok et
+    }
+
+    // Yeni bir grafik nesnesi oluştur
+    window.lineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: lineLabels,
+            datasets: [{
+                label: 'İzlenme Durumu',
+                data: lineData,
+                borderColor: 'blue',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+}
+
+            // Dropdown seçim olayını dinleyerek veriyi alıyoruz
+            document.getElementById('chartDropdown').addEventListener('change', function() {
+                var offsetValue = this.value;  // Dropdown'dan seçilen değeri alıyoruz
+
+                // AJAX isteği yapıyoruz
+                fetch(`/get-line-chart-data?offset=${offsetValue}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Line chart'ı güncelliyoruz
+                        updateLineChart(data);
+                    })
+                    .catch(error => console.error('Veri alınırken hata oluştu:', error));
+            });
+
+            // Sayfa ilk açıldığında, default 1-10 seçili olmalı ve veriyi yüklemeliyiz
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('chartDropdown').value = '10';  // Default olarak 1-10 seçili olacak
+                document.getElementById('chartDropdown').dispatchEvent(new Event('change'));  // Seçili değeri tetikle
             });
         </script>
 

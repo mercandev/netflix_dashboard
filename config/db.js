@@ -133,6 +133,28 @@ const getCityData = (callback) => {
     });
 };
 
+// Çizgi grafiği verisini almak için fonksiyon (offset parametresi ile)
+const getLineChartData = (offset, callback) => {
+  const query = `
+      SELECT diziler.dizi_adi, COUNT(*) AS izlenme_adet
+      FROM diziler 
+      INNER JOIN izlenme_kaydi 
+          ON izlenme_kaydi.dizi_id = diziler.id
+      WHERE izlenme_kaydi.film_id IS NULL 
+      GROUP BY diziler.dizi_adi
+      LIMIT 10 OFFSET ?; 
+  `;
+
+  db.query(query, [parseInt(offset)], (err, results) => { // offset değerini tamsayıya dönüştürüyoruz
+    if (err) {
+      console.error('Veritabanı hatası:', err);
+      return callback(err, null);
+    }
+    console.log(results);
+    callback(null, results); // Veriyi geri gönder
+  });
+};
+
 // Bu fonksiyonları dışa aktarıyoruz
 module.exports = { 
   db, 
@@ -143,5 +165,6 @@ module.exports = {
   getSeriesCount, 
   getFilmsCount, 
   getGenreData,
-  getCityData
+  getCityData,
+  getLineChartData
 };

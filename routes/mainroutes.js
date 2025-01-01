@@ -5,6 +5,9 @@ const db = require('../config/db'); // Veritabanı bağlantısını ayarladığ�
 // Main sayfasına yönlendirme
 router.get('/main', (req, res) => {
   if (req.session.username) {
+    // offset parametresi alınır, varsayılan olarak 0
+    const offset = req.query.offset || 0;
+
     // Aktif kullanıcı sayısını al
     db.getActiveUserCount((err, activeUserCount) => {
       if (err) {
@@ -47,15 +50,24 @@ router.get('/main', (req, res) => {
                   return res.status(500).send('Veritabanı hatası');
                 }
 
-                // Verileri şablona gönderiyoruz
-                res.render('main', { 
-                  username: req.session.username, 
-                  activeUserCount: activeUserCount, 
-                  inactiveUserCount: inactiveUserCount, 
-                  totalBudget: totalBudget, 
-                  seriesCount: seriesCount, 
-                  filmsCount: filmsCount, 
-                  genreData: genreData // Türler bazında izlenme verisini doğrudan gönderiyoruz
+                // Çizgi grafik için veri al
+                db.getLineChartData(offset, (err, lineChartData) => {
+                  if (err) {
+                    console.error('Çizgi grafik verisi alınamadı:', err);
+                    return res.status(500).send('Veritabanı hatası');
+                  }
+
+                  // Verileri şablona gönderiyoruz
+                  res.render('main', { 
+                    username: req.session.username, 
+                    activeUserCount: activeUserCount, 
+                    inactiveUserCount: inactiveUserCount, 
+                    totalBudget: totalBudget, 
+                    seriesCount: seriesCount, 
+                    filmsCount: filmsCount, 
+                    genreData: genreData, 
+                    lineChartData: lineChartData // Çizgi grafik verisini gönderiyoruz
+                  });
                 });
               });
             });
@@ -66,6 +78,18 @@ router.get('/main', (req, res) => {
   } else {
     res.redirect('/login'); // Eğer session'da kullanıcı yoksa login sayfasına yönlendir
   }
+});
+
+router.get('/get-line-chart-data', (req, res) => {
+  const offset = req.query.offset || 10; // Eğer offset parametresi yoksa 10 olsun.
+  
+  db.getLineChartData(offset, (err, lineChartData) => {
+      if (err) {
+          console.error('Çizgi grafik verisi alınamadı:', err);
+          return res.status(500).send('Veritabanı hatası');
+      }
+      res.json(lineChartData); // Line chart verisini JSON olarak dönüyoruz
+  });
 });
 
 module.exports = router;

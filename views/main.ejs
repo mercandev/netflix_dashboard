@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
 <body>
     <div class="container">
@@ -35,35 +36,26 @@
 
         <!-- Kullanıcılar ve Bütçe Kutuları -->
         <div class="stats-container">
-            <!-- 1. Aktif Kullanıcılar Kutusu -->
             <div class="stats-box active">
                 <i class="material-icons">home</i>
                 <p><strong>Aktif Kullanıcılar:</strong></p>
                 <p class="stats-count"><%= activeUserCount %></p>
             </div>
-
-            <!-- 2. Kapalı Kullanıcılar Kutusu -->
             <div class="stats-box inactive">
                 <i class="material-icons">block</i>
                 <p><strong>Kapalı Kullanıcılar:</strong></p>
                 <p class="stats-count"><%= inactiveUserCount %></p>
             </div>
-
-            <!-- 3. Bütçe Kutusu -->
             <div class="stats-box budget">
                 <i class="material-icons">attach_money</i>
                 <p><strong>Bütçe:</strong></p>
                 <p class="stats-count"><%= totalBudget %> $</p>
             </div>
-
-            <!-- 4. Toplam Diziler Kutusu -->
             <div class="stats-box series">
                 <i class="material-icons">tv</i>
                 <p><strong>Toplam Diziler:</strong></p>
                 <p class="stats-count"><%= seriesCount %></p>
             </div>
-
-            <!-- 5. Toplam Filmler Kutusu -->
             <div class="stats-box films">
                 <i class="material-icons">movie</i>
                 <p><strong>Toplam Filmler:</strong></p>
@@ -82,7 +74,6 @@
 
             <!-- Line Chart -->
             <div class="chart-item">
-                <!-- Dropdown Menü -->
                 <div style="margin-top: 10px;">
                     <select id="chartDropdown" style="padding: 5px; font-size: 14px;">
                         <option value="10">1-10</option>
@@ -98,9 +89,9 @@
 
         <script>
             // genreData'yı doğrudan JavaScript dizisi olarak alıyoruz
-            var genreData = <%- JSON.stringify(genreData) %>;  // Veriyi doğrudan güvenli şekilde alıyoruz
+            var genreData = <%- JSON.stringify(genreData) %>;
 
-            console.log(genreData);  // Veriyi kontrol et
+            console.log(genreData);
 
             var labels = genreData.map(item => item.ad);
             var data = genreData.map(item => item.adet);
@@ -135,57 +126,71 @@
             });
 
             function updateLineChart(lineChartData) {
-    var lineLabels = lineChartData.map(item => item.dizi_adi);
-    var lineData = lineChartData.map(item => item.izlenme_adet);
+                var lineLabels = lineChartData.map(item => item.dizi_adi);
+                var lineData = lineChartData.map(item => item.izlenme_adet);
 
-    var ctx = document.getElementById('lineChart').getContext('2d');
+                var ctx = document.getElementById('lineChart').getContext('2d');
 
-    // Eğer önceki bir grafik varsa, onu temizle
-    if (window.lineChart instanceof Chart) {
-        window.lineChart.destroy();  // Geçerli bir grafik nesnesi varsa yok et
-    }
-
-    // Yeni bir grafik nesnesi oluştur
-    window.lineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: lineLabels,
-            datasets: [{
-                label: 'İzlenme Durumu',
-                data: lineData,
-                borderColor: 'blue',
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
+                // Eğer önceki bir grafik varsa, onu temizle
+                if (window.lineChart instanceof Chart) {
+                    window.lineChart.destroy();
                 }
+
+                // Yeni bir grafik nesnesi oluştur
+                window.lineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: lineLabels,
+                        datasets: [{
+                            label: 'İzlenme Durumu',
+                            data: lineData,
+                            borderColor: 'blue',
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            annotation: {
+                                annotations: {
+                                    line1: {
+                                        type: 'line',
+                                        xMin: 0,
+                                        xMax: lineLabels.length - 1,
+                                        yMin: 50,
+                                        yMax: 50,
+                                        borderColor: 'red',
+                                        borderWidth: 2,
+                                        label: {
+                                            content: 'Eşik Değeri (50)',
+                                            enabled: true,
+                                            position: 'center'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             }
-        }
-    });
-}
 
-            // Dropdown seçim olayını dinleyerek veriyi alıyoruz
             document.getElementById('chartDropdown').addEventListener('change', function() {
-                var offsetValue = this.value;  // Dropdown'dan seçilen değeri alıyoruz
+                var offsetValue = this.value;
 
-                // AJAX isteği yapıyoruz
                 fetch(`/get-line-chart-data?offset=${offsetValue}`)
                     .then(response => response.json())
                     .then(data => {
-                        // Line chart'ı güncelliyoruz
                         updateLineChart(data);
                     })
                     .catch(error => console.error('Veri alınırken hata oluştu:', error));
             });
 
-            // Sayfa ilk açıldığında, default 1-10 seçili olmalı ve veriyi yüklemeliyiz
             document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('chartDropdown').value = '10';  // Default olarak 1-10 seçili olacak
-                document.getElementById('chartDropdown').dispatchEvent(new Event('change'));  // Seçili değeri tetikle
+                document.getElementById('chartDropdown').value = '10';
+                document.getElementById('chartDropdown').dispatchEvent(new Event('change'));
             });
         </script>
 

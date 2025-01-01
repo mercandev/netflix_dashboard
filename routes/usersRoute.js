@@ -10,10 +10,10 @@ router.get('/users', (req, res) => {
         return res.status(500).send('Veritabanı hatası');
       }
 
-      // `cityData`'yı JSON formatında frontend'e gönderiyoruz
+      // cityData'yı JSON.stringify kullanmadan doğrudan göndermek
       res.render('users', {
         username: req.session.username,
-        cityData: JSON.stringify(cityData)  // cityData'yı JSON formatında gönderiyoruz
+        cityData: cityData  // cityData'yı doğrudan gönderiyoruz
       });
     });
   } else {

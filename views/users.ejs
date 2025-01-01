@@ -60,6 +60,12 @@
             </div>
         </nav>
 
+        <div class="note-box">
+            Aşağıdaki veriler anlık olacak, harita üzerinde en çok kullanıcımızın bulunduğu illeri gösterir.
+        </div>
+
+        <div id="map"></div>
+
         <!-- Renk Paleti (Legend) -->
         <div class="legend">
             <div class="legend-labels">
@@ -92,7 +98,7 @@
                             .attr("height", height);
 
                 // GeoJSON verisini yüklüyoruz
-                var geojsonUrl = '/public/tr-cities.json';  // Türkiye'nin GeoJSON dosyasını buraya ekliyoruz
+                var geojsonUrl = '/tr-cities.json';  // Türkiye'nin GeoJSON dosyasını buraya ekliyoruz
 
                 // GeoJSON verisini alıyoruz
                 d3.json(geojsonUrl).then(function(turkeyGeoJson) {
@@ -100,7 +106,7 @@
                     var projection = d3.geoMercator()
                         .center([35, 39])  // Türkiye'nin coğrafi merkezi
                         .scale(2700)       // Ölçek, haritanın boyutlarını ayarlamak için
-                        .translate([width / 2, height / 2 - 120]); // Haritayı yukarıya kaydırmak için translate ile y-ekseni ayarı
+                        .translate([width / 2, height / 2 - 110]); // Haritayı yukarıya kaydırmak için translate ile y-ekseni ayarı
 
                     var path = d3.geoPath().projection(projection);
 

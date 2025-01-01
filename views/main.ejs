@@ -71,20 +71,23 @@
             </div>
         </div>
 
-        <!-- Donut Chart - Türler bazında izlenme -->
+        <!-- İzlenen Dizi Türleri Başlığı -->
+        <h4 style="text-align: left; margin-top: 30px; margin-left: 25px;">İzlenen Dizi Türleri</h4>
+
+        <!-- Donut Chart Konumu ve Boyutu -->
         <div style="margin-top: 40px; margin-bottom: 40px;">
-            <canvas id="donutChart"></canvas>
+            <canvas id="donutChart"></canvas> <!-- Inline style kaldırıldı -->
         </div>
 
         <script>
-            // genreData'yi doğrudan JavaScript'e aktarıyoruz
-            var genreData = JSON.stringify(genreData);  // Veriyi doğrudan alıyoruz
-
+            // genreData'yı doğrudan JavaScript dizisi olarak alıyoruz
+            var genreData = <%- JSON.stringify(genreData) %>;  // Veriyi doğrudan güvenli şekilde alıyoruz
+        
             console.log(genreData);  // Veriyi kontrol et
-
+        
             var labels = genreData.map(item => item.ad);
             var data = genreData.map(item => item.adet);
-
+        
             var ctx = document.getElementById('donutChart').getContext('2d');
             var donutChart = new Chart(ctx, {
                 type: 'doughnut',
@@ -106,7 +109,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(tooltipItem) {
-                                    return tooltipItem.label + ': ' + tooltipItem.raw + ' izlenme';
+                                    return tooltipItem.label + ': ' + tooltipItem.raw + ' kişi';
                                 }
                             }
                         }

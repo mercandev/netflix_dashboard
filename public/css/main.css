@@ -205,3 +205,13 @@ body {
     text-align: center;
     border-radius: 5px;
 }
+
+/* Donut Chart Konumu ve Boyutu */
+#donutChart {
+    margin-top: 30px;  /* 3 kez aşağıya kaydırıyoruz */
+    margin-bottom: 40px; /* Altında boşluk bırakıyoruz */
+    height: 500px !important; /* Yüksekliği uygun hale getiriyoruz */
+    display: block;
+    box-sizing: border-box;
+}
+

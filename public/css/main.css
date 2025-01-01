@@ -1,0 +1,207 @@
+/* Genel Sayfa Stili */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+
+/* Menü Stili */
+.navbar {
+    display: flex;
+    justify-content: flex-start; /* Logo ve menüyü sola hizalarız */
+    align-items: center; /* Logo ve menüyü ortalarız */
+    background-color: red;
+    padding: 15px 30px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.navbar .logo {
+    margin-right: 50px; /* Logo ile menü arasındaki mesafeyi azaltıyoruz */
+}
+
+.navbar .logo img {
+    height: 40px; /* Logoyu küçültüyoruz */
+    max-height: 100%;
+    width: auto;
+}
+
+/* Menu */
+.navbar .menu {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    gap: 45px; /* Menü öğeleri arasındaki mesafeyi kısaltıyoruz */
+}
+
+.navbar .menu li {
+    margin: 0;
+}
+
+.navbar .menu a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* session-info'yu sağa yerleştir */
+.navbar .session-info {
+    display: flex;
+    align-items: center;
+    position: relative; /* Dropdown menüsü için konumlandırma */
+    margin-left: auto; /* Sağ tarafa yaslamak için */
+}
+
+/* Kullanıcı adını ve dropdown açma simgesini stilize et */
+.navbar .session-info span {
+    color: white;
+    margin-right: 10px; /* Kullanıcı adı ve dropdown arasındaki mesafeyi kısaltıyoruz */
+    font-size: 16px;
+    cursor: pointer; /* Tıklanabilir hale getiriyoruz */
+}
+
+/* Dropdown Menüsü Stili */
+.dropdown-content {
+    display: none; /* Başlangıçta gizli */
+    position: absolute;
+    right: 0;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    z-index: 1;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 8px 0;
+    border-radius: 5px;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+/* Dropdown açıldığında görünür hale gelir */
+.dropdown-show {
+    display: block;
+}
+
+/* Çıkış butonu üzerine gelindiğinde stil */
+.navbar .logout {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    background-color: transparent;
+    border: 1px solid white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.navbar .logout:hover {
+    background-color: white;
+    color: red;
+}
+
+/* Aktif Kullanıcı Sayısını Gösteren Kutu */
+.active-users-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Sayfanın tamamını ortalamak için */
+}
+
+.active-users-box {
+    background-color: #28a745; /* Yeşil renk */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.active-users-count {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+/* Stats (Kullanıcılar ve Bütçe) Kutuları */
+.stats-container {
+    display: flex;
+    justify-content: space-between; /* Kutuları yatayda aralarındaki mesafeyi eşitleyerek yerleştirir */
+    margin-top: 100px; /* Kutuları biraz daha aşağıya kaydırıyoruz */
+    padding: 0 20px;
+}
+
+.stats-box {
+    width: 250px; /* Kutuların genişliğini biraz daha geniş yapıyoruz */
+    height: 150px; /* Kutuların yüksekliğini artırıyoruz */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    font-size: 20px; /* Yazı büyüklüğünü arttırdık */
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Kutulara hafif gölge efekti */
+}
+
+/* 1. Aktif Kullanıcılar */
+.stats-box.active {
+    background-color: #e83e8c; /* Pembe arka plan */
+}
+
+/* 2. Kapalı Kullanıcılar */
+.stats-box.inactive {
+    background-color: #007bff; /* Mavi arka plan */
+}
+
+/* 3. Bütçe */
+.stats-box.budget {
+    background-color: #28a745; /* Yeşil arka plan */
+}
+
+/* 4. Toplam Diziler */
+.stats-box.series {
+    background-color: #6f42c1; /* Mor arka plan */
+}
+
+/* 5. Toplam Filmler */
+.stats-box.films {
+    background-color: #ffc107; /* Sarı arka plan */
+}
+
+/* Sayılar kısmı */
+.stats-box .stats-count {
+    font-size: 30px;
+    margin-top: 10px;
+}
+
+/* İkonlar (ya da metinler) */
+.stats-box i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+/* Note Box Stili */
+.note-box {
+    margin-top: 80px;  /* Navbar'dan sonra boşluk bırakıyoruz */
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-left: 5px solid #ff0000;  /* Kırmızı sol kenarlık */
+    font-size: 16px;
+    color: #333;
+    max-width: 100%;
+    text-align: center;
+    border-radius: 5px;
+}

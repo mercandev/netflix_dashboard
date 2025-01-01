@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcılar</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script> <!-- D3.js -->
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        /* Harita boyutunun sayfaya sığması için ayar */
+        #map {
+            width: 100%;  /* Genişliği %100 yapıyoruz */
+            height: 90vh;  /* Yüksekliği görünümün %90'ı kadar yapıyoruz */
+            margin: 0 auto;
+        }
+        
+        /* Renk paletinin alt kısmı için stil */
+        .legend {
+            margin-top: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .legend span {
+            display: inline-block;
+            width: 30px;
+            height: 10px;
+            margin: 0 5px;
+        }
+        
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Menü -->
+        <nav class="navbar">
+            <div class="logo">
+                <img src="/images/netflix-logo-white.png" alt="Netflix Logo">
+            </div>
+            <ul class="menu">
+                <li><a href="/main">Ana Sayfa</a></li>
+                <li><a href="/users">Kullanıcılar</a></li>
+                <li><a href="/movies">Filmler</a></li>
+                <li><a href="/series">Diziler</a></li>
+            </ul>
+            <div class="session-info">
+                <span id="welcome-message">Hoşgeldiniz, <%= username %>!</span>
+                <div class="dropdown">
+                    <span id="dropdown-btn">▼</span>
+                    <div id="dropdown-menu" class="dropdown-content">
+                        <a href="/logout" class="logout">Çıkış</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Renk Paleti (Legend) -->
+        <div class="legend">
+            <div class="legend-labels">
+            </div>
+            <div id="color-legend"></div>
+        </div>
+
+        <script>
+            // cityData verisini doğrudan JavaScript dizisi olarak alıyoruz
+            var cityData = <%- JSON.stringify(cityData) %>;  // Veriyi doğrudan JavaScript dizisi olarak alıyoruz
+
+            console.log(cityData);  // cityData'nın içeriğini kontrol et
+
+            // cityData'nın geçerli bir dizi olup olmadığını kontrol edelim
+            if (Array.isArray(cityData) && cityData.length > 0) {
+                console.log('Veri başarılı bir şekilde alındı:', cityData);
+
+                // En büyük ve en küçük adet değerlerini bulma
+                var maxAdet = Math.max(...cityData.map(function(c) { return c.adet; }));
+                var minAdet = Math.min(...cityData.map(function(c) { return c.adet; }));
+
+                // Harita için SVG alanı oluşturuyoruz
+                var width = document.getElementById('map').offsetWidth;
+                var height = window.innerHeight;
+
+                // SVG elemanı oluşturuyoruz
+                var svg = d3.select("#map")
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height", height);
+
+                // GeoJSON verisini yüklüyoruz
+                var geojsonUrl = '/public/tr-cities.json';  // Türkiye'nin GeoJSON dosyasını buraya ekliyoruz
+
+                // GeoJSON verisini alıyoruz
+                d3.json(geojsonUrl).then(function(turkeyGeoJson) {
+                    // Türkiye haritası için projeksiyon ve yol çizimi
+                    var projection = d3.geoMercator()
+                        .center([35, 39])  // Türkiye'nin coğrafi merkezi
+                        .scale(2700)       // Ölçek, haritanın boyutlarını ayarlamak için
+                        .translate([width / 2, height / 2 - 120]); // Haritayı yukarıya kaydırmak için translate ile y-ekseni ayarı
+
+                    var path = d3.geoPath().projection(projection);
+
+                    // Renk skalası
+                    var colorScale = d3.scaleLinear()
+                        .domain([minAdet, maxAdet])  // Adet aralığını belirliyoruz
+                        .range(["#ffcccc", "#ff0000"]);  // En düşük adet için açık kırmızı, en yüksek adet için koyu kırmızı
+
+                    // Harita üzerine illeri çiziyoruz
+                    svg.selectAll("path")
+                        .data(turkeyGeoJson.features)
+                        .enter()
+                        .append("path")
+                        .attr("d", path)
+                        .attr("fill", function(d) {
+                            var city = cityData.find(c => c.il === d.properties.name);  // Veritabanındaki şehir ile GeoJSON'daki ismi eşleştiriyoruz
+                            var value = city ? city.adet : 0;  // Eğer şehir bulunursa adet değeri döndürülüyor, yoksa 0 döndürülüyor
+                            return colorScale(value);  // Renk skalasını uygula
+                        })
+                        .attr("stroke", "#fff")
+                        .attr("stroke-width", 1)
+                        .on("mouseover", function(event, d) {
+                            var city = cityData.find(c => c.il === d.properties.name);
+                            var value = city ? city.adet : 0;
+                            d3.select(this).attr("stroke", "#000").attr("stroke-width", 2);  // Mouseover efekti
+                            svg.append("text")
+                               .attr("id", "tooltip")
+                               .attr("x", event.pageX)
+                               .attr("y", event.pageY)
+                               .attr("text-anchor", "middle")
+                               .text(d.properties.name + ": " + value + " adet");
+                        })
+                        .on("mouseout", function(d) {
+                            d3.select(this).attr("stroke", "#fff").attr("stroke-width", 1);  // Mouseout efekti
+                            d3.select("#tooltip").remove();  // Tooltip kaldır
+                        });
+
+                    // Renk Paletini (Legend) ekleyelim
+                    var legendWidth = 200;  // Paletin genişliği
+                    var legendHeight = 20;  // Paletin yüksekliği
+                    var legend = d3.select("#color-legend")
+                                   .append("svg")
+                                   .attr("width", legendWidth)
+                                   .attr("height", legendHeight);
+
+                    // Palet için bir gradyan oluşturuyoruz
+                    var gradient = legend.append("defs")
+                                         .append("linearGradient")
+                                         .attr("id", "gradient")
+                                         .attr("x1", "0%")
+                                         .attr("x2", "100%")
+                                         .attr("y1", "0%")
+                                         .attr("y2", "0%");
+
+                    // Renk geçişlerini tanımlıyoruz
+                    gradient.append("stop")
+                            .attr("offset", "0%")
+                            .attr("stop-color", "#ffcccc");  // En düşük renk
+                    gradient.append("stop")
+                            .attr("offset", "100%")
+                            .attr("stop-color", "#ff0000");  // En yüksek renk
+
+                    // Renk geçişi için bir dikdörtgen çizeriz
+                    legend.append("rect")
+                          .attr("width", legendWidth)
+                          .attr("height", legendHeight)
+                          .style("fill", "url(#gradient)");
+
+                });
+
+            } else {
+                console.error('cityData geçerli bir dizi değil:', cityData);
+            }
+        </script>
+    </div>
+</body>
+</html>

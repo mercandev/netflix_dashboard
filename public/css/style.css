@@ -1,0 +1,93 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    background: url('/images/background_netflix.jpg') no-repeat center center/cover; /* Arka plan resmi */
+}
+
+.login-container {
+    width: 400px;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem; /* Arttırılmış boşluk */
+}
+
+.logo img {
+    max-width: 120px;
+}
+
+.dashboard-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-top: 1rem; /* Daha fazla boşluk */
+    margin-bottom: 1.5rem; /* Daha fazla boşluk */
+    color: #EE4B2B;
+}
+
+.input-field {
+    position: relative;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center; /* Sağ-sol hizalama */
+}
+
+.input-field input:focus {
+    border-color: #EE4B2B;
+}
+.input-field input {
+    width: 100%;  /* Textbox'lar tam genişlik alacak */
+    padding: 0.8rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.login-button {
+    width: 100%;  /* Button da aynı genişliği alacak */
+    padding: 0.8rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #EE4B2B;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 1rem;  /* Buton ile textbox arasında biraz boşluk */
+}
+
+.login-button:hover {
+    background-color: #d43f26;
+}
+
+/* Notification (error message) style */
+/* Notification (error message) style */
+.notification {
+    background-color: #f44336; /* Kırmızı */
+    color: white;
+    padding: 0.8rem; /* Button ile aynı padding */
+    font-size: 1rem;  /* Font boyutunu eşitle */
+    font-weight: 500;  /* Aynı font ağırlığı */
+    border-radius: 5px;
+    width: 93%;  /* Notification genişliği %100 olacak şekilde ayarlandı */
+    max-width: 400px;  /* Textbox ve button ile aynı genişlikte olacak şekilde max-width veriyoruz */
+    margin: 10px auto; /* Ortada olacak şekilde ve biraz boşluk ekliyoruz */
+    text-align: center; /* Mesajı ortalamak için */
+    display: none; /* Başlangıçta gizli */
+    z-index: 1000;
+}

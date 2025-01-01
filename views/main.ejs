@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Menü -->
+        <nav class="navbar">
+            <div class="logo">
+                <img src="/images/netflix-logo-white.png" alt="Netflix Logo">
+            </div>
+            <ul class="menu">
+                <li><a href="/main">Ana Sayfa</a></li>
+                <li><a href="/users">Kullanıcılar</a></li>
+                <li><a href="/movies">Filmler</a></li>
+                <li><a href="/series">Diziler</a></li>
+            </ul>
+            <div class="session-info">
+                <span id="welcome-message">Hoşgeldiniz, <%= username %>!</span>
+                <div class="dropdown">
+                    <span id="dropdown-btn">▼</span>
+                    <div id="dropdown-menu" class="dropdown-content">
+                        <a href="/logout" class="logout">Çıkış</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Kullanıcılar ve Bütçe Kutuları -->
+        <div class="stats-container">
+            <!-- 1. Aktif Kullanıcılar Kutusu -->
+            <div class="stats-box active">
+                <i class="material-icons">home</i>
+                <p><strong>Aktif Kullanıcılar:</strong></p>
+                <p class="stats-count"><%= activeUserCount %></p>
+            </div>
+
+            <!-- 2. Kapalı Kullanıcılar Kutusu -->
+            <div class="stats-box inactive">
+                <i class="material-icons">block</i>
+                <p><strong>Kapalı Kullanıcılar:</strong></p>
+                <p class="stats-count"><%= inactiveUserCount %></p>
+            </div>
+
+            <!-- 3. Bütçe Kutusu -->
+            <div class="stats-box budget">
+                <i class="material-icons">attach_money</i>
+                <p><strong>Bütçe:</strong></p>
+                <p class="stats-count"><%= totalBudget %> $</p>
+            </div>
+
+            <!-- 4. Toplam Diziler Kutusu -->
+            <div class="stats-box series">
+                <i class="material-icons">tv</i>
+                <p><strong>Toplam Diziler:</strong></p>
+                <p class="stats-count"><%= seriesCount %></p>
+            </div>
+
+            <!-- 5. Toplam Filmler Kutusu -->
+            <div class="stats-box films">
+                <i class="material-icons">movie</i>
+                <p><strong>Toplam Filmler:</strong></p>
+                <p class="stats-count"><%= filmsCount %></p>
+            </div>
+        </div>
+
+        <!-- Donut Chart - Türler bazında izlenme -->
+        <div style="margin-top: 40px; margin-bottom: 40px;">
+            <canvas id="donutChart"></canvas>
+        </div>
+
+        <script>
+            // genreData'yi doğrudan JavaScript'e aktarıyoruz
+            var genreData = JSON.stringify(genreData);  // Veriyi doğrudan alıyoruz
+
+            console.log(genreData);  // Veriyi kontrol et
+
+            var labels = genreData.map(item => item.ad);
+            var data = genreData.map(item => item.adet);
+
+            var ctx = document.getElementById('donutChart').getContext('2d');
+            var donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'İzlenme Türleri',
+                        data: data,
+                        backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw + ' izlenme';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+
+    </div>
+</body>
+</html>

@@ -6,6 +6,7 @@ const path = require('path');
 const routes = require('./routes/loginroutes'); // loginroutes.js dosyasını içeri aktar
 const mainRoutes = require('./routes/mainroutes'); // mainroutes.js dosyasını içeri aktar
 const usersRoutes = require('./routes/usersRoute'); // mainroutes.js dosyasını içeri aktar
+const series = require('./routes/series'); // mainroutes.js dosyasını içeri aktar
 
 
 // Body parsing middleware
@@ -29,10 +30,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(routes); // loginroutes.js dosyasındaki yönlendirmeleri kullan
 app.use(mainRoutes); // mainroutes.js dosyasındaki yönlendirmeleri kullan
 app.use(usersRoutes); 
+app.use(series);
 
 
 // Sunucuyu başlat
-const PORT = 4000;
+const PORT = 1111;
 app.listen(PORT, () => {
   console.log(`Sunucu http://localhost:${PORT} üzerinde çalışıyor.`);
 });

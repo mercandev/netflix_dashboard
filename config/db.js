@@ -155,6 +155,90 @@ const getLineChartData = (offset, callback) => {
   });
 };
 
+////////////////////////////////////
+
+// Dizileri almak için fonksiyon (sayfalama ile)
+const getSeriesData = (offset, callback) => {
+  const query = `
+    SELECT diziler.id, diziler.dizi_adi, turler.ad AS dizi_turu, diziler.yayin_tarihi, diziler.sure, diziler.aciklama
+    FROM diziler
+    INNER JOIN turler ON diziler.dizi_turu_id = turler.id
+    LIMIT 10 OFFSET ?;
+  `;
+  
+  db.query(query, [parseInt(offset)], (err, results) => {  // parseInt ile offset'i doğru şekilde işliyoruz
+    if (err) {
+      console.error('Veritabanı hatası:', err);
+      return callback(err, null);
+    }
+    callback(null, results); // Dizileri geri gönder
+  });
+};
+
+// Dizi türlerini almak için fonksiyon
+const getTurlerData = (callback) => {
+  const query = 'SELECT * FROM turler';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Veritabanı hatası:', err);
+      return callback(err, null);
+    }
+    callback(null, results); // Türleri geri gönder
+  });
+};
+
+// Yeni dizi eklemek için fonksiyon
+const addNewSeries = (dizi_adi, imdb_id, dizi_turu_id, imdb_puani, yayin_tarihi, sezon_sayisi, bolum_sayisi, aciklama, sure, callback) => {
+  const query = `
+    INSERT INTO diziler (dizi_adi, imdb_id, dizi_turu_id, imdb_puani, yayin_tarihi, sezon_sayisi, bolum_sayisi, aciklama, sure)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+  `;
+  db.query(query, [dizi_adi, imdb_id, dizi_turu_id, imdb_puani, yayin_tarihi, sezon_sayisi, bolum_sayisi, aciklama, sure], (err, results) => {
+    if (err) {
+      console.error('Veritabanı hatası:', err);
+      return callback(err);
+    }
+    callback(null); // Başarıyla eklendi
+  });
+};
+
+// Diziyi silme işlemi
+const deleteSeries = (diziId, callback) => {
+  // Öncelikle butce tablosundan ilgili diziyi sil
+  const deleteFromButceQuery = 'DELETE FROM butce WHERE dizi_id = ?';
+
+  db.query(deleteFromButceQuery, [diziId], (err, result) => {
+      if (err) {
+          console.error('Butçeden silme hatası:', err);
+          return callback(err, null);
+      }
+
+      // İzlenme kaydı tablosundan da diziyi silelim
+      const deleteFromIzlenmeKaydiQuery = 'DELETE FROM izlenme_kaydi WHERE dizi_id = ?';
+
+      db.query(deleteFromIzlenmeKaydiQuery, [diziId], (err, result) => {
+          if (err) {
+              console.error('İzlenme kaydı tablosundan silme hatası:', err);
+              return callback(err, null);
+          }
+
+          // Diziler tablosundan ilgili kaydı silelim
+          const deleteFromDizilerQuery = 'DELETE FROM diziler WHERE id = ?';
+
+          db.query(deleteFromDizilerQuery, [diziId], (err, result) => {
+              if (err) {
+                  console.error('Diziler tablosundan silme hatası:', err);
+                  return callback(err, null);
+              }
+
+              // Başarıyla silindi
+              callback(null, result);
+          });
+      });
+  });
+};
+
+
 // Bu fonksiyonları dışa aktarıyoruz
 module.exports = { 
   db, 
@@ -166,5 +250,9 @@ module.exports = {
   getFilmsCount, 
   getGenreData,
   getCityData,
-  getLineChartData
+  getLineChartData,
+  deleteSeries,
+  getSeriesData,
+  addNewSeries,
+  getTurlerData
 };

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diziler</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="/images/netflix-logo-white.png" alt="Netflix Logo">
+            </div>
+            <ul class="menu">
+                <li><a href="/main">Ana Sayfa</a></li>
+                <li><a href="/users">Kullanıcılar</a></li>
+                <li><a href="/series">Diziler</a></li>
+            </ul>
+            <div class="session-info">
+                <span id="welcome-message">Hoşgeldiniz, <%= username %>!</span>
+            </div>
+        </nav>
+
+        <h2 class="section-title">İzlenen Diziler</h2>
+
+        <div class="table-container">
+            <!-- Dizi Ekle Butonu -->
+            <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addSeriesModal">Dizi Ekle</button>
+
+            <!-- Tablo -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Başlık</th>
+                        <th>Dizi Türü</th>
+                        <th>Yayın Tarihi</th>
+                        <th>Süre</th>
+                        <th>Açıklama</th>
+                        <th>Sil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% seriesData.forEach(function(series) { %>
+                        <tr>
+                            <td><%= series.dizi_adi %></td>
+                            <td><%= series.tur_ad %></td>
+                            <td><%= series.yayin_tarihi %></td>
+                            <td><%= series.sure %> dk</td>
+                            <td><%= series.aciklama.slice(0, 50) %>...</td>
+                            <td><button class="btn btn-danger delete-btn" data-id="<%= series.id %>">Sil</button></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+
+            <!-- Sayfalama -->
+           <!-- Sayfalama -->
+<div class="pagination">
+    <% if (currentOffset > 0) { %>
+        <a href="?offset=<%= currentOffset - 10 %>">« Önceki</a>
+    <% } %>
+    <a href="?offset=<%= currentOffset + 10 %>">Sonraki »</a>
+</div>
+
+        <!-- Modal: Dizi Ekle -->
+        <div class="modal" id="addSeriesModal">
+            <div class="modal-content">
+                <h3>Yeni Dizi Ekle</h3>
+                <form action="/series/add" method="POST">
+                    <label for="dizi_adi">Dizi Adı</label>
+                    <input type="text" id="dizi_adi" name="dizi_adi" required>
+
+                    <label for="dizi_turu_id">Dizi Türü</label>
+                    <select name="dizi_turu_id" id="dizi_turu_id" required>
+                        <% turler.forEach(function(tur) { %>
+                            <option value="<%= tur.id %>"><%= tur.ad %></option>
+                        <% }); %>
+                    </select>
+
+                    <label for="imdb_id">IMDB ID</label>
+                    <input type="text" id="imdb_id" name="imdb_id" required>
+
+                    <label for="imdb_puani">IMDB Puanı</label>
+                    <input type="number" id="imdb_puani" name="imdb_puani" max="10" step="0.1" required>
+
+                    <label for="yayin_tarihi">Yayın Tarihi</label>
+                    <input type="text" id="yayin_tarihi" name="yayin_tarihi" required placeholder="1/11/2019">
+
+                    <label for="sezon_sayisi">Sezon Sayısı</label>
+                    <input type="number" id="sezon_sayisi" name="sezon_sayisi" required>
+
+                    <label for="bolum_sayisi">Bölüm Sayısı</label>
+                    <input type="number" id="bolum_sayisi" name="bolum_sayisi" required>
+
+                    <label for="aciklama">Açıklama</label>
+                    <textarea id="aciklama" name="aciklama" required></textarea>
+
+                    <label for="sure">Dizi Süresi (dakika)</label>
+                    <input type="number" id="sure" name="sure" required>
+
+                    <button type="submit" class="btn btn-submit">Ekle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const diziId = this.getAttribute('data-id');
+
+        // Silme işlemi için AJAX isteği
+        fetch(`/series/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ dizi_id: diziId })  // Silinecek dizi ID'sini gönderiyoruz
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Silme başarılıysa, ilgili diziyi sayfadan kaldır
+                this.closest('tr').remove();
+                alert(data.message); // Başarı mesajı göster
+            } else {
+                alert('Silme işlemi başarısız oldu');
+            }
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+            alert('Bir hata oluştu.');
+        });
+    });
+});
+    </script>
+</body>
+</html>

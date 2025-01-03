@@ -1,16 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diziler</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/main.css">
+  <meta charset="UTF-8" />
+  <title>Diziler</title>
+  <!-- Bootstrap 5 CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Google Fonts & Icons -->
+  <link
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Projeye özgü CSS (main.css) -->
+  <link rel="stylesheet" href="/css/main.css" />
 </head>
+
 <body>
-    <div class="container">
-        <nav class="navbar">
+  <div class="container-fluid">
+    <!-- Navbar -->
+          <!-- Menü -->
+          <nav class="navbar">
             <div class="logo">
                 <img src="/images/netflix-logo-white.png" alt="Netflix Logo">
             </div>
@@ -21,121 +36,262 @@
             </ul>
             <div class="session-info">
                 <span id="welcome-message">Hoşgeldiniz, <%= username %>!</span>
+                <div class="dropdown">
+                    <div id="dropdown-menu" class="dropdown-content">
+                        <a href="/logout" class="logout">Çıkış</a>
+                    </div>
+                </div>
             </div>
         </nav>
 
-        <h2 class="section-title">İzlenen Diziler</h2>
 
-        <div class="table-container">
-            <!-- Dizi Ekle Butonu -->
-            <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addSeriesModal">Dizi Ekle</button>
+  </div>
 
-            <!-- Tablo -->
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Başlık</th>
-                        <th>Dizi Türü</th>
-                        <th>Yayın Tarihi</th>
-                        <th>Süre</th>
-                        <th>Açıklama</th>
-                        <th>Sil</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% seriesData.forEach(function(series) { %>
-                        <tr>
-                            <td><%= series.dizi_adi %></td>
-                            <td><%= series.tur_ad %></td>
-                            <td><%= series.yayin_tarihi %></td>
-                            <td><%= series.sure %> dk</td>
-                            <td><%= series.aciklama.slice(0, 50) %>...</td>
-                            <td><button class="btn btn-danger delete-btn" data-id="<%= series.id %>">Sil</button></td>
-                        </tr>
-                    <% }); %>
-                </tbody>
-            </table>
+  <!-- İçerik -->
+  <div class="container mt-4">
+    <h2 class="section-title text-center">İzlenen Diziler</h2>
 
-            <!-- Sayfalama -->
-           <!-- Sayfalama -->
-<div class="pagination">
-    <% if (currentOffset > 0) { %>
-        <a href="?offset=<%= currentOffset - 10 %>">« Önceki</a>
-    <% } %>
-    <a href="?offset=<%= currentOffset + 10 %>">Sonraki »</a>
-</div>
-
-        <!-- Modal: Dizi Ekle -->
-        <div class="modal" id="addSeriesModal">
-            <div class="modal-content">
-                <h3>Yeni Dizi Ekle</h3>
-                <form action="/series/add" method="POST">
-                    <label for="dizi_adi">Dizi Adı</label>
-                    <input type="text" id="dizi_adi" name="dizi_adi" required>
-
-                    <label for="dizi_turu_id">Dizi Türü</label>
-                    <select name="dizi_turu_id" id="dizi_turu_id" required>
-                        <% turler.forEach(function(tur) { %>
-                            <option value="<%= tur.id %>"><%= tur.ad %></option>
-                        <% }); %>
-                    </select>
-
-                    <label for="imdb_id">IMDB ID</label>
-                    <input type="text" id="imdb_id" name="imdb_id" required>
-
-                    <label for="imdb_puani">IMDB Puanı</label>
-                    <input type="number" id="imdb_puani" name="imdb_puani" max="10" step="0.1" required>
-
-                    <label for="yayin_tarihi">Yayın Tarihi</label>
-                    <input type="text" id="yayin_tarihi" name="yayin_tarihi" required placeholder="1/11/2019">
-
-                    <label for="sezon_sayisi">Sezon Sayısı</label>
-                    <input type="number" id="sezon_sayisi" name="sezon_sayisi" required>
-
-                    <label for="bolum_sayisi">Bölüm Sayısı</label>
-                    <input type="number" id="bolum_sayisi" name="bolum_sayisi" required>
-
-                    <label for="aciklama">Açıklama</label>
-                    <textarea id="aciklama" name="aciklama" required></textarea>
-
-                    <label for="sure">Dizi Süresi (dakika)</label>
-                    <input type="number" id="sure" name="sure" required>
-
-                    <button type="submit" class="btn btn-submit">Ekle</button>
-                </form>
-            </div>
-        </div>
+    <br>
+    <!-- "Dizi Ekle" Butonu (Modal açar) -->
+    <div class="text-end mb-3">
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#addSeriesModal"
+      >
+        Dizi Ekle
+      </button>
     </div>
 
-    <script>
-       document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const diziId = this.getAttribute('data-id');
+    <!-- Diziler Tablosu -->
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table">
+          <tr>
+            <th>Başlık</th>
+            <th>Dizi Türü</th>
+            <th>Yayın Tarihi</th>
+            <th>Süre</th>
+            <th>Açıklama</th>
+            <th>Sil</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% seriesData.forEach(function(series) { %>
+            <tr data-dizi-id="<%= series.id %>">
+              <td><%= series.dizi_adi %></td>
+              <td><%= series.dizi_turu %></td>
+              <td><%= series.yayin_tarihi %></td>
+              <td><%= series.sure %> dk</td>
+              <td><%= series.aciklama.slice(0, 50) %>...</td>
+              <td>
+                <button
+                  class="btn btn-danger delete-btn"
+                  data-id="<%= series.id %>"
+                >
+                  Sil
+                </button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
 
-        // Silme işlemi için AJAX isteği
-        fetch(`/series/delete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ dizi_id: diziId })  // Silinecek dizi ID'sini gönderiyoruz
+    <!-- Sayfalama -->
+    <div class="d-flex justify-content-between mt-4">
+      <% if (currentOffset > 0) { %>
+        <a
+          class="btn btn-outline-primary"
+          href="?offset=<%= currentOffset - 10 %>"
+        >
+          « Önceki
+        </a>
+      <% } else { %>
+        <button class="btn btn-outline-secondary" disabled>« Önceki</button>
+      <% } %>
+      <a
+        class="btn btn-outline-primary"
+        href="?offset=<%= currentOffset + 10 %>"
+      >
+        Sonraki »
+      </a>
+    </div>
+  </div>
+
+  <!-- Modal: Dizi Ekle (AJAX ile) -->
+  <div
+    class="modal fade"
+    id="addSeriesModal"
+    tabindex="-1"
+    aria-labelledby="addSeriesModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addSeriesModalLabel">Yeni Dizi Ekle</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Burada normal <form> yerine inputlarla veri alıyoruz -->
+          <div class="mb-3">
+            <label for="dizi_adi" class="form-label">Dizi Adı</label>
+            <input type="text" id="dizi_adi" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label for="dizi_turu_id" class="form-label">Dizi Türü</label>
+            <select id="dizi_turu_id" class="form-select">
+              <% turler.forEach(function(tur) { %>
+                <option value="<%= tur.id %>"><%= tur.ad %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="imdb_id" class="form-label">IMDB ID</label>
+            <input type="text" id="imdb_id" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label for="imdb_puani" class="form-label">IMDB Puanı</label>
+            <input
+              type="number"
+              id="imdb_puani"
+              class="form-control"
+              max="10"
+              step="0.1"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="yayin_tarihi" class="form-label">Yayın Tarihi</label>
+            <input
+              type="text"
+              id="yayin_tarihi"
+              class="form-control"
+              placeholder="2019-01-01"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="sezon_sayisi" class="form-label">Sezon Sayısı</label>
+            <input type="number" id="sezon_sayisi" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label for="bolum_sayisi" class="form-label">Bölüm Sayısı</label>
+            <input type="number" id="bolum_sayisi" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label for="aciklama" class="form-label">Açıklama</label>
+            <textarea
+              id="aciklama"
+              class="form-control"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="sure" class="form-label">Dizi Süresi (dakika)</label>
+            <input type="number" id="sure" class="form-control" />
+          </div>
+        </div>
+        <div class="modal-footer">
+            <button id="saveSeriesBtn" type="button" class="btn btn-success">
+                Ekle
+              </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-bs-dismiss="modal"
+          >
+            Kapat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Bootstrap 5 JS (Modal) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Silme butonu AJAX
+    document.querySelectorAll('.delete-btn').forEach((btn) => {
+      btn.addEventListener('click', function () {
+        const diziId = this.getAttribute('data-id');
+        fetch('/series/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dizi_id: diziId })
         })
-        .then(response => response.json())
-        .then(data => {
+          .then((res) => res.json())
+          .then((data) => {
             if (data.success) {
-                // Silme başarılıysa, ilgili diziyi sayfadan kaldır
-                this.closest('tr').remove();
-                alert(data.message); // Başarı mesajı göster
+              // Satırı DOM'dan kaldır
+              this.closest('tr').remove();
+              alert(data.message);
             } else {
-                alert('Silme işlemi başarısız oldu');
+              alert('Silme işlemi başarısız');
             }
+          })
+          .catch((err) => {
+            console.error('Hata:', err);
+            alert('Hata oluştu');
+          });
+      });
+    });
+
+    // Ekleme butonu (AJAX)
+    document.getElementById('saveSeriesBtn').addEventListener('click', function () {
+      const dizi_adi = document.getElementById('dizi_adi').value;
+      const dizi_turu_id = document.getElementById('dizi_turu_id').value;
+      const imdb_id = document.getElementById('imdb_id').value;
+      const imdb_puani = document.getElementById('imdb_puani').value;
+      const yayin_tarihi = document.getElementById('yayin_tarihi').value;
+      const sezon_sayisi = document.getElementById('sezon_sayisi').value;
+      const bolum_sayisi = document.getElementById('bolum_sayisi').value;
+      const aciklama = document.getElementById('aciklama').value;
+      const sure = document.getElementById('sure').value;
+
+      fetch('/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dizi_adi,
+          imdb_id,
+          dizi_turu_id,
+          imdb_puani,
+          yayin_tarihi,
+          sezon_sayisi,
+          bolum_sayisi,
+          aciklama,
+          sure
         })
-        .catch(error => {
-            console.error('Hata:', error);
-            alert('Bir hata oluştu.');
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert(data.message);
+            // Modal'ı kapat
+            let myModal = bootstrap.Modal.getInstance(
+              document.getElementById('addSeriesModal')
+            );
+            myModal.hide();
+
+            // İsteğe bağlı: yeni eklenen diziyi tabloya ekleyin veya sayfayı yenileyin:
+            // location.reload();
+          } else {
+            alert('Dizi eklenemedi: ' + data.message);
+          }
+        })
+        .catch((err) => {
+          console.error('Hata:', err);
+          alert('Hata oluştu');
         });
     });
-});
-    </script>
+  </script>
 </body>
 </html>

@@ -160,7 +160,7 @@ const getLineChartData = (offset, callback) => {
 // Dizileri almak için fonksiyon (sayfalama ile)
 const getSeriesData = (offset, callback) => {
   const query = `
-    SELECT diziler.id, diziler.dizi_adi, turler.ad AS dizi_turu, diziler.yayin_tarihi, diziler.sure, diziler.aciklama
+    SELECT diziler.id, diziler.dizi_adi, turler.ad AS dizi_turu, DATE_FORMAT(diziler.yayin_tarihi, '%d/%m/%Y') as yayin_tarihi, diziler.sure, diziler.aciklama
     FROM diziler
     INNER JOIN turler ON diziler.dizi_turu_id = turler.id
     LIMIT 10 OFFSET ?;
